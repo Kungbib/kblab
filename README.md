@@ -8,18 +8,23 @@ This repository aims to provide and demo tools for researchers in preparation of
 
 ## TLDR;
 
-Start environment
+Start environment using docker-compose, files written to `/data` will turn up in the `data` directory
 ```
 git clone https://github.com/kungbib/kblab
 cd kblab
 docker-compose exec repository.kb.se/lab/client /bin/bash
 ```
 
-See examples below.
+Then, see [examples](#examples) below.
 
 ## API
 
+The API is a simple REST-based API on top of 
+
 ### URIs
+
+https://betalab.kb.se/dark-4001723/
+https://betalab.kb.se/dark-4001723/bib4345612_20140405_119570_95_0002.jp2
 
 ## Python client
 
