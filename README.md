@@ -8,8 +8,10 @@ This repository aims to provide and demo tools for researchers in preparation of
 
 ## TLDR;
 
-Start environment using docker-compose, files written to `/data` will turn up in the `data` directory
+Start environment using docker-compose. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
+
 ```
+# connect to data lab
 git clone https://github.com/kungbib/kblab
 cd kblab
 docker-compose exec repository.kb.se/lab/client /bin/bash
@@ -23,8 +25,9 @@ The API is a simple REST-based API on top of
 
 ### URIs
 
-https://betalab.kb.se/dark-4001723/
-https://betalab.kb.se/dark-4001723/bib4345612_20140405_119570_95_0002.jp2
+Examples
+- https://betalab.kb.se/dark-4001723/
+- https://betalab.kb.se/dark-4001723/bib4345612_20140405_119570_95_0002.jp2
 
 ## Python client
 
@@ -53,6 +56,9 @@ a = Archive('https://betalab.kb.se/')
 
 # find a specific issue of Aftonbladet
 for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
+    p = a.get(package_id)
+
+    # iterate over files in package
     for fname in a.get(package_id):
         if fname.endswith('_alto.xml'):
             # apply fix for potentially borken ALTO files
