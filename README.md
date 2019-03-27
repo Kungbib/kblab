@@ -11,17 +11,17 @@ This repository aims to provide and demo tools for researchers in preparation of
 Start environment using docker-compose. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
 
 ```
-# connect to data lab
 git clone https://github.com/kungbib/kblab
 cd kblab
 docker-compose exec repository.kb.se/lab/client /bin/bash
+d8fg7sjf4i # python
 ```
 
 Then, see [examples](#examples) below.
 
 ## API
 
-The API is a simple REST-based API on top of 
+The API is a simple REST-based API that delivers JSON(-LD) describing packages and/or files with the addition of a search endpoint.
 
 ### URIs
 
@@ -29,30 +29,21 @@ Examples
 - https://betalab.kb.se/dark-4001723/
 - https://betalab.kb.se/dark-4001723/bib4345612_20140405_119570_95_0002.jp2
 
+### Finding packages
+
+### Data model
+
 ## Python client
 
 ## Docker images
 
 ## Examples
 
-### Step 1 - Start Python
-```
-# python
-```
-
-### Step 2 - import relevant pacakages, for example
+### Do word frequency analysis on first ten pages of Aftonbladet, issue 1899-12-22
 ```
 from kblab import Archive
 from kblab.utils import fix_alto,get_alto_content
-```
-
-### Step 3 - connect
-```
 a = Archive('https://betalab.kb.se/')
-```
-
-### Step 4 - search for files and do something with the result
-```
 
 # find a specific issue of Aftonbladet
 for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
@@ -68,4 +59,11 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
 ```
 
 ## IIIF support
+
+Images in the archive can either be downloaded and dealt with directly in full resolution or they can be cropped and scaled using the IIIF protocol.
+
+### Manifests
+
+For same packages IIIF-manifests can be accessed by adding `/_manifest` to a URI. See example below.
+
 
