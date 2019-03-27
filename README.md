@@ -33,17 +33,21 @@ Examples
 
 ### Data model
 
+The National Library uses a package structure modeled on OAIS. A simplified representation in JSON-LD is provided as part of the response in addition to information about the logical structure of the material (e.g pages, covers), some metadata, links to physical object, etc.
+
 ## Python client
 
 ## Docker images
 
 ## Examples
 
-### Do word frequency analysis on first ten pages of Aftonbladet, issue 1899-12-22
+### Word frequency of Aftonbladet, issue 1899-12-22
 ```
+from collections import Counter
 from kblab import Archive
 from kblab.utils import fix_alto,get_alto_content
 a = Archive('https://betalab.kb.se/')
+c = Counter()
 
 # find a specific issue of Aftonbladet
 for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
@@ -56,6 +60,9 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
             text = get_alto_content(fix_alto(a.get(fname)))
             
             # do something with the text
+            c.update(text.split())
+
+print(c)
 ```
 
 ## IIIF support
