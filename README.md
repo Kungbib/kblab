@@ -4,16 +4,18 @@
 
 ## About
 
-This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects in the data lab: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
+This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives on-premise at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
 
 ## TLDR;
 
-Start environment using docker-compose. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
+## TLDR; - Docker version
+
+Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
 
 ```
 git clone https://github.com/kungbib/kblab
 cd kblab
-docker-compose exec repository.kb.se/lab/client /bin/bash
+docker container run -it repository.kb.se/lab/client /bin/bash
 d8fg7sjf4i # python
 ```
 
@@ -41,7 +43,7 @@ The National Library uses a package structure modeled on OAIS. A simplified repr
 
 ## Examples
 
-### Word frequency of Aftonbladet, issue 1899-12-22
+### Word count of Aftonbladet, issue 1899-12-22
 ```
 from collections import Counter
 from kblab import Archive
@@ -56,13 +58,16 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
     # iterate over files in package
     for fname in a.get(package_id):
         if fname.endswith('_alto.xml'):
-            # apply fix for potentially borken ALTO files
+            # apply fix for potentially borken ALTO files and get text
             text = get_alto_content(fix_alto(a.get(fname)))
             
             # do something with the text
             c.update(text.split())
+    for word,count in c:
+        print(word, count, sep='\t')
+else:
+    print('not found')
 
-print(c)
 ```
 
 ## IIIF support
