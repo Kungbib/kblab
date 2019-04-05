@@ -17,13 +17,17 @@ pip install -r requirements.txt
 ./setup.py install
 ```
 
+Optionally build and run the Docker image
+```
+docker build .
+docker run -it <image id> /bin/bash
+```
+
 ## TLDR; - Docker version
 
 Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
 
 ```
-git clone https://github.com/kungbib/kblab
-cd kblab
 docker container run -it repository.kb.se/lab/client /bin/bash
 d8fg7sjf4i # python
 ```
