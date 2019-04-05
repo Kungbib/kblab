@@ -30,6 +30,7 @@ class HttpPackage(kblab.Package):
                 raise Exception('%d %s' % (r.status_code, r.text))
 
             self._desc = loads(r.text)
+            self._desc['files'] = { x['path']:x for x in self._desc['files'] }
         elif mode in [ 'w', 'a' ]:
             raise Exception('mode \'w\' or \'a\' not supported for HttpPackage()')
         else:

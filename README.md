@@ -60,7 +60,9 @@ The National Library uses a package structure modeled on OAIS. A simplified repr
 ```
 from collections import Counter
 from kblab import Archive
-from kblab.utils import fix_alto,get_alto_content
+from kblab.utils import fix_alto
+from kblab.helpers get_alto_content
+
 a = Archive('https://betalab.kb.se/')
 c = Counter()
 
@@ -74,7 +76,7 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
             # apply fix for potentially borken ALTO files and get text
             text = get_alto_content(fix_alto(a.get(fname)))
             
-            # do something with the text
+            # your research goes here ...
             c.update(text.split())
     for word,count in c:
         print(word, count, sep='\t')
