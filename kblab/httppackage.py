@@ -11,7 +11,6 @@ from re import compile
 from os import listdir
 import kblab.package
 from urllib.parse import urljoin
-from werkzeug.urls import url_fix
 from tempfile import TemporaryFile
 
 VERSION = 0.1
@@ -31,34 +30,10 @@ class HttpPackage(kblab.Package):
                 raise Exception('%d %s' % (r.status_code, r.text))
 
             self._desc = loads(r.text)
-
-            if mode is 'a' and self._desc['status'] == 'finalized':
-                raise Exception('package is finalized, use patch(...)')
-        elif mode == 'w':
-            raise Exception('mode \'w\' not supported for HttpPackage(), use \'a\'')
+        elif mode in [ 'w', 'a' ]:
+            raise Exception('mode \'w\' or \'a\' not supported for HttpPackage()')
         else:
             raise Exception('unsupported mode (\'%s\')' % mode)
-
-
-    def add(self, fname, path=None, traverse=True, exclude='^\\..*|^_.*', replace=False, **kwargs):
-        if self._mode != 'a':
-            raise Exception('package not writable, open in \'a\' mode')
-
-        path = path or basename(abspath(fname))
-
-        if path == '_package.json' or path == '_log':
-            raise Exception('path (%s) not allowed' % path)
-
-        if traverse and isdir(fname):
-            self._add_directory(fname, path, exclude=exclude)
-        else:
-            self._write(fname, valid_path(path), replace=replace, **kwargs)
-
-        self._reload()
-
-
-    def replace(self, fname, path=None, **kwargs):
-        self.add(fname, path, replace=True, **kwargs)        
 
 
     def get_raw(self, path, range=None):
@@ -110,14 +85,6 @@ class HttpPackage(kblab.Package):
         if self._mode == 'r':
             raise Exception('package is in read-only mode')
 
-        r = post(self.url + 'finalize', auth=self.auth)
-
-        if r.status_code not in [ 200, 204 ]:
-            raise Exception('%d %s' % (r.status_code, r.text))
-
-        self._desc['status'] = 'finalized'
-        self._mode = 'r'
-
 
     def description(self):
         ret = deepcopy(self._desc)
@@ -137,45 +104,8 @@ class HttpPackage(kblab.Package):
         self._mode = 'r'
 
 
-    def _write(self, iname, path, replace=False):
-        with TemporaryFile(mode='wb+') as f, open(iname, mode='rb') as i:
-            hasher = sha256()
-            b = None
-            while b == None or b != b'':
-                b = i.read(100*1024)
-                f.write(b)
-                hasher.update(b)
-
-            f.seek(0)
-
-            r = put(url_fix(urljoin(self.url, path)),
-                    params={ 'replace': replace,
-                             'expected_hash': 'SHA256:' + hasher.digest().hex() },
-                    files={ path: f },
-                    auth=self.auth)
-
-            if r.status_code not in[ 200, 204 ]:
-                raise Exception('%d %s' % (r.status_code, r.text))
-    
-
-    def remove(self, path):
-        r = delete(self.url + path, auth=self.auth)
-
-        if r.status_code not in [ 200, 204 ]:
-            raise Exception('%d %s' % (r.status_code, r.text))
-
-        del self._desc['files'][path]
-
-
     def status(self):
         return self._desc['status']
-
-
-    def _add_directory(self, dir, path, exclude='^\\..*|^_.*'):
-        ep = compile(exclude)
-        for f in listdir(dir):
-            if not ep.match(f):
-                self.add(join(dir, f), path=join(path, f), exclude=exclude)
 
 
     def _reload(self):
@@ -200,15 +130,4 @@ class HttpPackage(kblab.Package):
 
     def __str__(self):
         return dumps(self.description(), indent=4)
-
-
-def do_hash(fname):
-    h = sha256()
-    with open(fname, mode='rb') as f:
-        b=None
-        while b != b'':
-            b = f.read(100*1024)
-            h.update(b)
-
-    return 'SHA256:' + h.digest().hex()
 
