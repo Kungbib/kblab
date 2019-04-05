@@ -6,7 +6,16 @@
 
 This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives on-premise at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
 
-## TLDR;
+## TLDR; - from source
+
+```
+git clone https://github.com/kungbib/kblab
+cd kblab
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+./setup.py install
+```
 
 ## TLDR; - Docker version
 
