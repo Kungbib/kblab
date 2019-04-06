@@ -6,30 +6,38 @@
 
 This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives on-premise at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
 
+## Installation
+
+## TLDR; - Docker version
+
+Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
+```
+docker container run -it repository.kb.se/lab/client /bin/bash
+d8fg7sjf4i # python
+```
+
+Then, see [examples](#examples) below.
+
 ## TLDR; - from source
 
+First check out the source code
 ```
 git clone https://github.com/kungbib/kblab
 cd kblab
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-./setup.py install
 ```
 
-Optionally build and run the Docker image
+Either build and run the Docker image 
 ```
 docker build .
 docker run -it <image id> /bin/bash
 ```
 
-## TLDR; - Docker version
-
-Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
-
+Or install the required package and python client. Optionally create a virtual environment so as to not mess up you existing one.
 ```
-docker container run -it repository.kb.se/lab/client /bin/bash
-d8fg7sjf4i # python
+python -m venv venv
+source venv/bin/activate
+pip install -r requirement.txt
+./setup.py install
 ```
 
 Then, see [examples](#examples) below.
