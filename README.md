@@ -18,7 +18,7 @@ d8fg7sjf4i # python
 
 Then, see [examples](#examples) below.
 
-## TLDR; - from source
+## From source
 
 First check out the source code
 ```
