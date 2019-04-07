@@ -23,34 +23,6 @@ class HttpArchive(kblab.Archive):
                 raise Exception('unsupported auth configuration')
 
 
-    def new(self, **kwargs):
-        r = post(urljoin(self.url,'new'), params=kwargs, auth=self.auth, allow_redirects=False)
-        
-        if r.status_code != 201:
-            raise Exception('expected HTTP status 201, but got %d' % r.status_code)
-
-        url = r.headers['Location']
-
-        return (self.get_key(url),
-                kblab.Package(
-                    url,
-                    mode='a',
-                    auth=self.auth,
-                    server_base=url.replace(self.url, self.base)))
-
-
-    def ingest(self, package, key=None):
-        files = { path:package.get_raw(path) for path in package }
-        r = post(self.url + 'ingest', files=files, auth=self.auth)
-
-        if r.status_code != 201:
-            raise Exception('expected HTTP status 201, but got %d with content %s' % (r.status_code, r.text))
-
-        url = r.headers['Location']
-
-        return self.get_key(url)
-
-
     def get(self, key, mode='r'):
         try:
             return kblab.Package(
