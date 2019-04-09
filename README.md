@@ -8,6 +8,25 @@ This repository aims to provide and demo tools for researchers in preparation of
 
 ## Installation
 
+## TLDR; - pip or conda
+
+To install the client module using `pip` simply run
+```
+pip install kblab-client
+```
+
+To install using `conda` instead use the following
+```
+conda install kblab-client
+```
+
+Or add it to your dependiencies in `environment.yml`
+```
+dependencies:
+    - pip:
+        kblab-client
+```
+
 ## TLDR; - Docker version
 
 Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
@@ -26,13 +45,13 @@ git clone https://github.com/kungbib/kblab
 cd kblab
 ```
 
-Either build and run the Docker image 
+Then either build and run the Docker image 
 ```
 docker build .
 docker run -it <image id> /bin/bash
 ```
 
-Or install the required package and python client. Optionally create a virtual environment so as to not mess up you existing one.
+Or install the required package and python client, optionally creating a virtual environment so as to not mess up you existing one.
 ```
 python -m venv venv
 source venv/bin/activate
