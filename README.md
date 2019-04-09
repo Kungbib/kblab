@@ -8,7 +8,7 @@ This repository aims to provide and demo tools for researchers in preparation of
 
 ## Installation
 
-## TLDR; - pip or conda
+## TLDR; - [pip](https://pypi.org/) or [conda](https://www.anaconda.com/distribution/)
 
 To install the client module using `pip` simply run
 ```
@@ -20,12 +20,14 @@ To install using `conda` instead use the following
 conda install kblab-client
 ```
 
-Or add it to your dependiencies in `environment.yml`
+Or add it to your dependencies in `environment.yml`
 ```
 dependencies:
     - pip:
         kblab-client
 ```
+
+Then, see [examples](#examples) below.
 
 ## TLDR; - Docker version
 
