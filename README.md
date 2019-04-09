@@ -4,7 +4,7 @@
 
 ## About
 
-This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives on-premise at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
+This repository aims to provide and demo tools for researchers in preparation of gaining access to digital archives on-premise at the National Library, or anyone else wanting to access collections without active copyright. There are two main ways to access digital objects: either by using the HTTP API directly or using the provided client written in Python. You can also create a Docker image based on the one below which will have the client installed, or use the install the client using `pip` or `conda` in your own container. The data available outside the National Library, currently on https://betalab.kb.se, does not have active copyright.
 
 ## Installation
 
@@ -103,9 +103,9 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
     for fname in a.get(package_id):
         if fname.endswith('_alto.xml'):
             # apply fix for potentially borken ALTO files and get text
-            text = get_alto_content(fix_alto(a.get(fname)))
+            text = get_alto_content(a.get_stream(fname))
             
-            # your research goes here ...
+            # research goes here ...
             c.update(text.split())
     for word,count in c:
         print(word, count, sep='\t')
@@ -116,10 +116,10 @@ else:
 
 ## IIIF support
 
-Images in the archive can either be downloaded and dealt with directly in full resolution or they can be cropped and scaled using the IIIF protocol.
+Images in the archive can either be downloaded and dealt with directly in full resolution or they can be cropped and scaled using the [IIIF](https://iiif.io/) protocol.
 
 ### Manifests
 
-For same packages IIIF-manifests can be accessed by adding `/_manifest` to a URI. See example below.
+For same packages IIIF-[manifests](https://iiif.io/api/presentation/2.0/#manifest) can be accessed by adding `/_manifest` to a URI. See example below.
 
 
