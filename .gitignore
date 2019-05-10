@@ -1,4 +1,6 @@
 build/
 data/*
 venv/
+dist/
+kblab.egg-info/
 kblab/__pycache__

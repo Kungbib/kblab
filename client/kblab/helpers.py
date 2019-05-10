@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from lxml import etree
+#from xml.etree import ElementTree as etree
 from argparse import ArgumentParser
 from os.path import abspath,dirname,isfile
 from sys import stdin,stdout,stderr,argv
