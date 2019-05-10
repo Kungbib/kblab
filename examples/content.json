@@ -1,0 +1,103 @@
+{
+    "@context": "/context.jsonld",
+    "@id": "https://archive.example.org/vfj58bjs/",
+    "@type": "Package",
+    "label": "Some example package",
+    "tags": [
+        "ebook"
+    ],
+    "urn": "urn:nbn:9cf369be-5e99-4b50-82cf-729ad26ffb08",
+    "instances": [
+    ],
+    "status": "finalized",
+    "focus": "https://id.example.org/123",
+    "created": "2016-03-24T16:50:07.225+01:00",
+    "files": [
+        {
+            "@id": "https://archive.example.org/vfj58bjs/book.pdf",
+            "@context": "http://id.example.org/context.json",
+            "@type": "Resource",
+            "urn": "urn:uuid:d31767de-5f00-4e00-9ac5-83117e627fc4",
+            "path": "book.pdf",
+            "mime_type": "text/epub",
+            "checksum": "MD5:5684113420b054eb71b37e5b34748ed0",
+            "size": 7846095,
+            "created": "2016-03-23T00:00:00"
+        }
+    ],
+    "see_also": [
+        "meta.json",
+        "structure.json",
+        "content.json"
+    ],
+    "meta": {
+        "@id": "https://id.example.org/123",
+        "@type": "Electronic",
+        "title": "A book",
+        "subject": [ "library science" ],
+        "publication_year": "2016",
+        "publication_date": "2016-01-01"
+    },
+    "has_part": [
+        {
+            "@id": "https://archive.example.org/vfj58bjs",
+            "@type": "Book",
+            "has_part": [
+                {
+                    "@id": "https://archive.example.org/vfj58bjs#1",
+                    "@type": "Page",
+                    "partOf": "https://archive.example.org/vfj58bjs",
+                    "has_part": [
+                        {
+                            "@id": "https://archive.example.org/vfj58bjs#1-1",
+                            "@type": "Area",
+                            "partOf": "https://archive.example.org/vfj58bjs#1",
+                            "has_part": [
+                                {
+                                    "@id": "https://archive.example.org/vfj58bjs#1-1-1",
+                                    "@type": "Text",
+                                    "partOf": "https://archive.example.org/vfj58bjs#1-1"
+                                },
+                                {
+                                    "@id": "https://archive.example.org/vfj58bjs#1-1-2",
+                                    "@type": "Text",
+                                    "partOf": "https://archive.example.org/vfj58bjs#1-1"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "@id": "https://archive.example.org/vfj58bjs#2",
+                    "@type": "Page",
+                    "has_part": [
+                        {
+                            "@id": "https://archive.example.org/vfj58bjs#2-1",
+                            "@type": "Image"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "content": [
+        {
+            "@id": "https://archive.example.org/vfj58bjs#1-1-1",
+            "@type": "Text",
+            "text": "A book about something"
+        },
+        {
+            "@id": "https://archive.example.org/vfj58bjs#1-1-2",
+            "@type": "Text",
+            "text": "With some text"
+        },
+        {
+            "@id": "https://archive.example.org/vfj58bjs#2-1",
+            "@type": "Image",
+            "tags": [
+            ]
+        }
+    ],
+    "size": 7846095
+}
+

@@ -1,0 +1,34 @@
+[
+    {
+        "@id": "https://betalab.kb.se/dark-1234#1",
+        "@type": "Page",
+        "pageNumber": "1",
+        "partOf": "https://betalab.kb.se/dark-1234",
+        "hasVersion": "https://betalab.kb.se/dark-1234/bib12345_0001.jp2",
+        "extractedFrom": "urn:nbn:se:kb:object-instance-123",
+        "hasPart": [
+            {
+                "@id": "https://betalab.kb.se/dark-1234#ARTICLE1234",
+                "@type": "Area",
+                "bounds": [ [ "0.0", "0.0" ], [ "0.2", "0.2" ] ],
+                "hasPart": [
+                    {
+                        "@id": "https://betalab.kb.se/dark-1234#ZONE1234",
+                        "@type": "Text",
+                        "fontSize": "12",
+                        "fontFamily": "sans-serif",
+                        "bounds": [ [ "0.0", "0.0" ], [ "0.1", "0.1" ] ]
+                    },
+                    {
+                        "@id": "https://betalab.kb.se/dark-1234#IMAGE1234",
+                        "@type": "Image",
+                        "bounds": [ [ "0.1", "0.1" ], [ "0.2", "0.2" ] ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+    }
+]
+
