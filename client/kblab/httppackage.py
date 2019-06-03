@@ -6,17 +6,19 @@ from kblab.utils import valid_path,valid_key,chunked
 from kblab.exceptions import RangeNotSupported
 from hashlib import sha256
 from copy import deepcopy
-from urllib.parse import urljoin
+from urllib.parse import urljoin,unquote
 from re import compile
 from os import listdir
 import kblab.package
 from urllib.parse import urljoin
 from tempfile import TemporaryFile
+from io import BytesIO
+from htfile import open as htopen
 
 VERSION = 0.1
 
 class HttpPackage(kblab.Package):
-    def __init__(self, url, mode='r', base=None, auth=None, server_base=None):
+    def __init__(self, url, mode='r', base=None, auth=None, server_base=None, label=None):
         self.url = url
         self._mode = mode
         self.auth = auth
@@ -24,17 +26,28 @@ class HttpPackage(kblab.Package):
         self.server_base = server_base or url
 
         if mode in [ 'r', 'a' ]:
-            r = get(self.url, headers={ 'Accept': 'application/json' }, auth=self.auth)
+            with closing(get(self.url, headers={ 'Accept': 'application/json' }, auth=self.auth, verify=kblab.VERIFY_CA)) as r:
+                #print(self.url)
 
-            if r.status_code != 200:
-                raise Exception('%d %s' % (r.status_code, r.text))
+                if r.status_code == 404:
+                    raise kblab.HttpNotFoundException(r.text)
+                elif r.status_code != 200:
+                    raise Exception('%d %s' % (r.status_code, r.text))
 
-            self._desc = loads(r.text)
-            self._desc['files'] = { x['path']:x for x in self._desc['files'] }
-        elif mode in [ 'w', 'a' ]:
-            raise Exception('mode \'w\' or \'a\' not supported for HttpPackage()')
+                self._desc = loads(r.text)
+
+                if mode is 'a' and self._desc['status'] == 'finalized':
+                    raise Exception('package is finalized, use patch(...)')
+
+                self._desc['files'] = { x['path']:x for x in self._desc['files'] }
+        elif mode == 'w':
+            raise Exception('mode \'w\' not supported for HttpPackage(), use mode \'a\' or HttpArchive.new(...)')
         else:
             raise Exception('unsupported mode (\'%s\')' % mode)
+
+
+    def get_location(self, path):
+        return self.url + path
 
 
     def get_raw(self, path, range=None):
@@ -47,10 +60,10 @@ class HttpPackage(kblab.Package):
             headers['Range'] = 'bytes=%d-%s' % (range[0], str(int(range[1])) if range[1] else '')
 
         # @TODO potential resource leak
-        r = get(self.url + path, stream=True, auth=self.auth, headers=headers)
+        r = get(self.get_location(path), stream=True, auth=self.auth, headers=headers, verify=kblab.VERIFY_CA)
         r.raw.decode_stream = True
 
-        if range and 'Accept-Ranges' not in r.headers or ('Accept-Ranges' in r.headers and r.headers['Accept-Ranges'] != 'bytes'):
+        if range and 'bytes' not in r.headers.get('Accept-Ranges', ''):
             raise RangeNotSupported()
 
         if r.status_code not in [ 200, 206 ]:
@@ -75,16 +88,11 @@ class HttpPackage(kblab.Package):
 
 
     def read(self, path):
-        return get(self.url + path, auth=self.auth).text
+        return get(self.url + path, auth=self.auth, verify=kblab.VERIFY_CA).text
 
 
     def list(self):
         return list(self._desc['files'].keys())
-
-
-    def finalize(self):
-        if self._mode == 'r':
-            raise Exception('package is in read-only mode')
 
 
     def description(self):
@@ -98,6 +106,9 @@ class HttpPackage(kblab.Package):
                 f = ret['files'][path]
                 f['@id'] = f['@id'].replace(server_base, self.base)
 
+        # de-dict
+        ret['files'] = [ x for x in ret['files'].values() ]
+
         return ret
 
 
@@ -109,8 +120,14 @@ class HttpPackage(kblab.Package):
         return self._desc['status']
 
 
+    @property
+    def label(self):
+        return self._desc['label']
+
+
     def _reload(self):
-        self._desc = loads(get(self.url, auth=self.auth).text)
+        self._desc = loads(get(self.url, auth=self.auth, verify=kblab.VERIFY_CA).text)
+        self._desc['files'] = { x['path']:x for x in self._desc['files'] }
 
 
     def __iter__(self):
@@ -131,4 +148,19 @@ class HttpPackage(kblab.Package):
 
     def __str__(self):
         return dumps(self.description(), indent=4)
+
+
+#    def __len__(self):
+#        return len(self._desc['files'])
+
+
+def do_hash(fname):
+    h = sha256()
+    with open(fname, mode='rb') as f:
+        b=None
+        while b != b'':
+            b = f.read(100*1024)
+            h.update(b)
+
+    return 'SHA256:' + h.digest().hex()
 

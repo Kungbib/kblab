@@ -136,7 +136,7 @@ kblab.VERIFY_CA=False
 
 ### Searching content and iterating over packages
 ```
-for package_id in s.search({ 'content': 'test' }):
+for package_id in a.search({ 'content': 'test' }):
     package = a.get(package_id)
 
     # do something with package
@@ -157,7 +157,6 @@ for file in package:
 ```
 from collections import Counter
 from kblab import Archive
-from kblab.helpers get_alto_content
 from json import load
 
 a = Archive('https://betalab.kb.se/')
