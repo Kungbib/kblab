@@ -118,7 +118,7 @@ The National Library uses a package structure modeled on OAIS. A simplified repr
 ]
 ```
 
-## Python client
+## Python 3.7 client
 
 ### Initializing archive
 ```
