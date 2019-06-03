@@ -70,8 +70,8 @@ The API is a simple REST-based API that delivers JSON(-LD) describing packages a
 ### URIs
 
 Examples
-- https://betalab.kb.se/dark-4001723/
-- https://betalab.kb.se/dark-4001723/bib4345612_20140405_119570_95_0002.jp2
+- https://betalab.kb.se/dark-29967/
+- https://betalab.kb.se/dark-29967/bib4345612_18620103_0_s_0001_alto.xml
 
 ### Finding packages
 
@@ -146,14 +146,14 @@ for package_id in s.search({ 'content': 'test' }):
 ### Listing and getting package content
 ```
 for file in package:
-    content = package.get_stream(f).read()
+    content = package.get_raw(f).read()
 ```
 
 ## Docker images
 
 ## Examples
 
-### Word count of Aftonbladet, issue 1899-12-22
+### Word count of Aftonbladet, issue 1862-01-03
 ```
 from collections import Counter
 from kblab import Archive
@@ -164,14 +164,14 @@ a = Archive('https://betalab.kb.se/')
 c = Counter()
 
 # find a specific issue of Aftonbladet
-for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
+for package_id in a.search({ 'label': 'AFTONBLADET 1862-01-03' }):
     p = a.get(package_id)
 
     # find content files
     for fname in p:
         if p[fname]['@type'] == 'Content':
             # iterate over content parts
-            for part in load(p.get_stream(fname)):
+            for part in load(p.get_raw(fname)):
                 if 'content' in part:
                     # research goes here ...
                     c.update(part['content'].split())
