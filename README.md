@@ -79,7 +79,75 @@ Examples
 
 The National Library uses a package structure modeled on OAIS. A simplified representation in JSON-LD is provided as part of the response in addition to information about the logical structure of the material (e.g pages, covers), some metadata, links to physical object, etc.
 
+### Structure documents
+
+```
+{
+    "@id": "#1",
+    "@type": "Monograph",
+    "derived_from": "https://.../1927_1(librisid_13483334).pdf",
+    "has_part": [
+        {
+            "@id": "#1-1",
+            "@type": "Page",
+            "has_part": [
+                {
+                    "@id": "#1-1-1",
+                    "@type": "Area"
+                    "has_part": [
+                        {
+                            "@id": "#1-1-1-1",
+                            "@type": "Text"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+### Content documents
+
+```
+[
+    {
+        "@id": "#1-1-1-1", 
+        "content": "..."
+    }
+]
+```
+
 ## Python client
+
+### Initializing archive
+```
+from kblab import Archive
+
+# connect to betalab. Use parameter auth=(username, password) for authentication
+a = Archive('https://betalab.kb.se')
+```
+
+**Caveat**: if you get an error about "certificate verify failed" you may need to update the root certificates on you platform. You can also add the following lines to your code. Please not that this is **NOT ADVISED**, it is better to add the correct root certificates.
+```
+import kblab
+kblab.VERIFY_CA=False
+```
+
+### Searching content and iterating over packages
+```
+for package_id in s.search({ 'content': 'test' }):
+    package = a.get(package_id)
+
+    # do something with package
+    ...    
+```
+
+### Listing and getting package content
+```
+for file in package:
+    content = package.get_stream(f).read()
+```
 
 ## Docker images
 
@@ -90,6 +158,7 @@ The National Library uses a package structure modeled on OAIS. A simplified repr
 from collections import Counter
 from kblab import Archive
 from kblab.helpers get_alto_content
+from json import load
 
 a = Archive('https://betalab.kb.se/')
 c = Counter()
@@ -98,14 +167,15 @@ c = Counter()
 for package_id in a.search({ 'label': 'AFTONBLADET 1899-12-22' }):
     p = a.get(package_id)
 
-    # iterate over files in package and find Alto (OCR) files
-    for fname in a.get(package_id):
-        if fname.endswith('_alto.xml'):
-            # get 
-            text = get_alto_content(a.get_stream(fname))
-            
-            # research goes here ...
-            c.update(text.split())
+    # find content files
+    for fname in p:
+        if p[fname]['@type'] == 'Content':
+            # iterate over content parts
+            for part in load(p.get_stream(fname)):
+                if 'content' in part:
+                    # research goes here ...
+                    c.update(part['content'].split())
+
     for word,count in c:
         print(word, count, sep='\t')
 else:
