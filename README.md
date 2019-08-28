@@ -182,8 +182,8 @@ for word,count in c:
     print(word, count, sep='\t')
 ```
 
-### Parallellization
-When processing large result sets parallellization can be crucial. This can be achieved either through using the `multiprocessing` module or the `map` method on the search result and parameter `multi=True`. A parallellized version in the example above could look like:
+### Parallelization
+When processing large result sets parallelization can be crucial. This can be achieved either through using the `multiprocessing` module or the `map` method on the search result and parameter `multi=True`. A parallelized version in the example above could look like:
 
 ```
 from collections import Counter
