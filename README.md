@@ -219,6 +219,22 @@ for word,count in c.items():
 
 The number of processes is specified by the `processes` parameter, it defaults to the number of cores on the machine running the program. For optimal performance, and if the order of the result is not important, add parameter `ordered=False` to `map(...)`.
 
+Parallelization using `multiprocessing.Pool` would look something like this:
+```
+...
+from multiprocessing import Pool
+
+def f(package_id):
+    # same as above
+    ...
+
+with Pool() as pool:
+    for words in pool.imap(a.search({ 'label': 'AFTONBLADET' }, max=25), f):
+        c.update(words)
+
+...
+```
+
 ## IIIF support
 
 Images in the archive can either be downloaded and dealt with directly in full resolution or they can be cropped and scaled using the [IIIF](https://iiif.io/) protocol.
