@@ -1,3 +1,4 @@
 pyyaml>=3.1.0
 requests>=2.13.0
 lxml>=4.3.0
+htfile>=0.0.1a

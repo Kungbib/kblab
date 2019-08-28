@@ -153,7 +153,7 @@ for file in package:
 
 ## Examples
 
-### Word count of Aftonbladet, issue 1862-01-03
+### Word count from 25 (unordered) issues of Aftonbladet
 ```
 from collections import Counter
 from kblab import Archive
@@ -163,7 +163,8 @@ a = Archive('https://betalab.kb.se/')
 c = Counter()
 
 # find a specific issue of Aftonbladet
-for package_id in a.search({ 'label': 'AFTONBLADET 1862-01-03' }):
+for package_id in a.search({ 'label': 'AFTONBLADET' }, max=25):
+    print(package_id)
     p = a.get(package_id)
 
     # find content files
@@ -174,13 +175,49 @@ for package_id in a.search({ 'label': 'AFTONBLADET 1862-01-03' }):
                 if 'content' in part:
                     # research goes here ...
                     c.update(part['content'].split())
-
-    for word,count in c:
-        print(word, count, sep='\t')
 else:
     print('not found')
 
+for word,count in c:
+    print(word, count, sep='\t')
 ```
+
+### Parallellization
+When processing large result sets parallellization can be crucial. This can be achieved either through using the `multiprocessing` module or the `map` method on the search result and parameter `multi=True`. A parallellized version in the example above could look like:
+
+```
+from collections import Counter
+from kblab import Archive
+from json import load
+import kblab
+
+a = Archive('https://betalab.kb.se/')
+c = Counter()
+
+def count(package_id):
+    print(package_id)
+    c = Counter()
+    p = a.get(package_id)
+        
+    for fname in p:
+        if p[fname]['@type'] == 'Content':
+            # iterate over content parts
+            for part in load(p.get_raw(fname)):
+                if 'content' in part:
+                    # research goes here ...
+                    c.update(part['content'].split())
+    
+    return c
+
+# loop over 25 issues of Aftonbladet
+for words in a.search({ 'label': 'AFTONBLADET' }, max=25).map(count, multi=True):
+    c.update(words)
+
+for word,count in c.items():
+    print(word, count, sep='\t')
+```
+
+The number of processes is specified by the `processes` parameter, default For optimal performance, and if the order of the result is not important, add parameter `ordered=False` to `map(...)`.
 
 ## IIIF support
 
