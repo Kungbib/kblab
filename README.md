@@ -217,7 +217,7 @@ for word,count in c.items():
     print(word, count, sep='\t')
 ```
 
-The number of processes is specified by the `processes` parameter, default For optimal performance, and if the order of the result is not important, add parameter `ordered=False` to `map(...)`.
+The number of processes is specified by the `processes` parameter, it defaults to the number of cores on the machine running the program. For optimal performance, and if the order of the result is not important, add parameter `ordered=False` to `map(...)`.
 
 ## IIIF support
 
