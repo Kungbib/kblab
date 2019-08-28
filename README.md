@@ -167,16 +167,9 @@ for package_id in a.search({ 'label': 'AFTONBLADET' }, max=25):
     print(package_id)
     p = a.get(package_id)
 
-    # find content files
-    for fname in p:
-        if p[fname]['@type'] == 'Content':
-            # iterate over content parts
-            for part in load(p.get_raw(fname)):
-                if 'content' in part:
-                    # research goes here ...
-                    c.update(part['content'].split())
-else:
-    print('not found')
+    if 'content.json' in p:
+        for part in load(p.get_raw(fname)):
+            c.update(part.get('content', '').toupper().split())
 
 for word,count in c:
     print(word, count, sep='\t')
@@ -199,13 +192,9 @@ def count(package_id):
     c = Counter()
     p = a.get(package_id)
         
-    for fname in p:
-        if p[fname]['@type'] == 'Content':
-            # iterate over content parts
-            for part in load(p.get_raw(fname)):
-                if 'content' in part:
-                    # research goes here ...
-                    c.update(part['content'].split())
+    if 'content.json' in p:
+        for part in load(p.get_raw(fname)):
+            c.update(part.get('content', '').toupper().split())
     
     return c
 
