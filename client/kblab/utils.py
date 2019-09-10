@@ -145,7 +145,7 @@ def aggregate(structure, content, environment):
     return ret
 
 
-def flerge(structure, content, meta, level='Text', ignore = []):
+def _flerge(structure, content, meta, level='Text', ignore = []):
     ret = []
     ignore += [ 'has_part', 'content' ]
 
@@ -162,6 +162,20 @@ def flerge(structure, content, meta, level='Text', ignore = []):
                 stack.insert(0, (nenviron, x))
 
     return ret
+
+
+def flerge(structure=None, content=None, meta=None, package=None, level='Text', ignore=[]):
+    if structure != None and content != None and meta != None:
+        pass
+    elif package != None:
+        structure = load(package.get_raw('structure.json'))
+        content = load(package.get_raw('content.json'))
+        meta = load(package.get_raw('meta.json'))
+    else:
+        throw Exception('Pass either structure, content and meta or package')
+
+    return _flerge(structure, content, meta, level, ignore)
+
 
 #if __name__ == '__main__':
 #    if len(argv) < 4 or len(argv) > 6:
