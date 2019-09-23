@@ -4,3 +4,5 @@ venv/
 dist/
 kblab.egg-info/
 kblab/__pycache__
+client/kblab/__pycache__/
+client/kblab_client.egg-info/
