@@ -172,7 +172,7 @@ def flerge(structure=None, content=None, meta=None, package=None, level='Text', 
         content = load(package.get_raw('content.json'))
         meta = load(package.get_raw('meta.json'))
     else:
-        throw Exception('Pass either structure, content and meta or package')
+        raise Exception('Pass either structure, content and meta or package')
 
     return _flerge(structure, content, meta, level, ignore)
 
