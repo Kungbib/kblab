@@ -126,6 +126,7 @@ def decode_range(srange):
 
 
 def aggregate(structure, content, environment):
+    print('aggregate')
     ret = copy(environment)
     ret_content = []
 
@@ -169,7 +170,7 @@ def flerge(structure=None, content=None, meta=None, package=None, level='Text', 
         pass
     elif package != None:
         structure = load(package.get_raw('structure.json'))
-        content = load(package.get_raw('content.json'))
+        content = { x['@id']:x for x in load(package.get_raw('content.json')) }
         meta = load(package.get_raw('meta.json'))
     else:
         raise Exception('Pass either structure, content and meta or package')
