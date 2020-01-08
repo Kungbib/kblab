@@ -145,7 +145,7 @@ class HttpArchive(kblab.Archive):
             r.raw.decode_stream = True
 
             return r.raw
-        else r.status_code == 404:
+        elif r.status_code == 404:
             raise FileNotFoundError(url)
 
         raise Exception(f'Server returned {r.status_code}')
