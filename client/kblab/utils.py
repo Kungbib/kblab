@@ -126,7 +126,6 @@ def decode_range(srange):
 
 
 def aggregate(structure, content, environment):
-    print('aggregate')
     ret = copy(environment)
     ret_content = []
 
@@ -135,8 +134,19 @@ def aggregate(structure, content, environment):
         element = stack.pop(0)
 
         for x in element if isinstance(element, list) else [ element ]:
-            if x.get('@id', '') in content and content[x['@id']].get('content', '') != '':
-                ret_content += [ content[x['@id']].get('content', '') ]
+            i = x.get('@id', '')
+
+            if i in content and content[i].get('content', '') != '':
+                ret_content += [ content[i].get('content', '') ]
+
+                # fulhack
+                if 'font' in content[i]:
+                    if 'font' not in ret:
+                        ret['font'] = []
+
+                    for f in content[i]['font']:
+                        if f not in ret['font']:
+                            ret['font'] += [ f ]
 
             if 'has_part' in x:
                 stack.insert(0, x['has_part'])

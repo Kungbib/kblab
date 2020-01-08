@@ -5,7 +5,7 @@ import setuptools
 
 setup(
     name='kblab-client',
-    version='0.0.10a0',
+    version='0.0.14a0',
     description='KB lab client',
     author='Martin Malmsten',
     author_email='martin.malmsten@kb.se',
@@ -16,6 +16,7 @@ setup(
         'lxml',
         'htfile'
     ],
-    packages=[ 'kblab' ]
+    packages=[ 'kblab' ],
+    include_package_data = True
 )
 

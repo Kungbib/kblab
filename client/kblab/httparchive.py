@@ -120,6 +120,42 @@ class HttpArchive(kblab.Archive):
             raise Exception('Use the force (parameter)')
 
 
+    def location(self, key, path=None):
+        return self.url + key + '/' + (path or '')
+
+
+    def exists(self, key, path=None):
+        url = self.location(key, path)
+
+        with closing(head(url, auth=self.auth)) as r:
+            if r.status_code == 200:
+                return True
+            elif r.status_code == 404:
+                return False
+
+            raise Exception(f'Server returned {r.status_code}')
+
+
+    def open(self, key, path, mode=''):
+        url = self.location(key, path)
+
+        r = get(url, auth=self.auth, stream=True)
+
+        if r.status_code == 200:
+            r.raw.decode_stream = True
+
+            return r.raw
+        else r.status_code == 404:
+            raise FileNotFoundError(url)
+
+        raise Exception(f'Server returned {r.status_code}')
+
+
+    def read(self, key, path, mode=''):
+        with self.open(key, path, mode=mode) as f:
+            return f.read()
+
+
     def search(self, query, start=0, max=None):
         g = self._search_iter(query, start, max)
         i,r,c = next(g).split()
