@@ -75,16 +75,24 @@ Examples
 
 ### Finding packages
 
+Packages may contain files of type `Structure`, `Content` or `Meta` which contain structure information, content and metadata respectively (see below for examples). The meta and content files are indexed and can be searched through the API. Content is indexed under `content` and metadata under `meta.*` and can be accesed either through the web interface or through the API. For example: 
+
+Get all packages tagged with `SOU` created in 1927: `{ "tags": "issue", "meta.created": "1927" }` or just `tags:SOU AND meta.created:1927` in the web interface.
+
+Also: see examples below.
+
 ### Data model
 
 The National Library uses a package structure modeled on OAIS. A simplified representation in JSON-LD is provided as part of the response in addition to information about the logical structure of the material (e.g pages, covers), some metadata, links to physical object, etc.
+
+Indexing is experimental at this point so verify your results. 
 
 ### Structure documents
 
 ```
 {
     "@id": "#1",
-    "@type": "Monograph",
+    "@type": "Part",
     "derived_from": "https://.../1927_1(librisid_13483334).pdf",
     "has_part": [
         {
@@ -116,6 +124,14 @@ The National Library uses a package structure modeled on OAIS. A simplified repr
         "content": "..."
     }
 ]
+```
+
+### Meta documents
+
+```
+{
+    "created": "1923",
+    "title": "An example"
 ```
 
 ## Python 3.7 client
