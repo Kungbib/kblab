@@ -234,7 +234,7 @@ def f(package_id):
     ...
 
 with Pool() as pool:
-    for words in pool.imap(a.search({ 'label': 'AFTONBLADET' }, max=25), f):
+    for words in pool.imap(f, a.search({ 'label': 'AFTONBLADET' }, max=25)):
         c.update(words)
 
 ...
