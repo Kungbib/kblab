@@ -65,25 +65,28 @@ Then, see [examples](#examples) below.
 
 ## API
 
-The API is a simple REST-based API that delivers JSON(-LD) describing packages and/or files with the addition of a search endpoint.
+The API is a simple REST-based API that delivers JSON(-LD-ish describing packages and/or files with the addition of a search endpoint.
 
 ### URIs
 
 Examples
 - https://betalab.kb.se/dark-29967/
+- https://betalab.kb.se/dark-29967/_view
 - https://betalab.kb.se/dark-29967/bib4345612_18620103_0_s_0001_alto.xml
 
 ### Finding packages
 
 Packages may contain files of type `Structure`, `Content` or `Meta` which contain structure information, content and metadata respectively (see below for examples). The meta and content files are indexed and can be searched through the API. Content is indexed under `content` and metadata under `meta.*` and can be accesed either through the web interface or through the API. For example: 
 
-**Example**: Get all packages tagged with `SOU` created in 1927: `{ "tags": "issue", "meta.created": "1927" }` or just `tags:SOU AND meta.created:1927` in the web interface.
+**Example**: Get all packages tagged with `SOU` created in 1927: `tags:issue meta.created:1927`.
+
+Content is indexed under `content` which is also the default prefix so the query `"olof palme" not "carl bildt"` will find any package where the phrase `"olof palme"` exists but **not** `"carl bildt"`
 
 **Also:** see examples below.
 
 ### Data model
 
-The National Library uses a package structure modeled on OAIS. A simplified representation in JSON-LD is provided as part of the response in addition to information about the logical structure of the material (e.g pages, covers), some metadata, links to physical object, etc.
+The National Library uses a package structure modeled on OAIS. A simplified representation in JSON-LD is provided as part of the response in addition to information about the structure of the material (e.g pages, covers), some metadata, links to physical object, etc.
 
 Indexing is experimental at this point so verify your results. 
 
@@ -132,6 +135,8 @@ Indexing is experimental at this point so verify your results.
 {
     "created": "1923",
     "title": "An example"
+    ...
+}
 ```
 
 ## Python 3.7 client
@@ -152,7 +157,7 @@ kblab.VERIFY_CA=False
 
 ### Searching content and iterating over packages
 ```
-for package_id in a.search({ 'content': 'test' }):
+for package_id in a.search({ 'content': 'test' }, max=20):
     package = a.get(package_id)
 
     # do something with package
@@ -162,7 +167,8 @@ for package_id in a.search({ 'content': 'test' }):
 ### Listing and getting package content
 ```
 for file in package:
-    content = package.get_raw(f).read()
+    content = package.open(f).read()
+    ...
 ```
 
 ## Docker images
