@@ -1,16 +1,22 @@
-from requests import get,post,delete as htdelete
+from requests import get,head,post,delete as htdelete
 from urllib.parse import urljoin
 from contextlib import closing
 from json import dumps,loads
 from sys import stderr
 from time import sleep
 from kblab.result import create_result
+from collections.abc import Iterator,Generator
 import kblab
 import logging
 
 MAX_ID=2**38
 MAX_RETRIES=2
 MAX_RETRY_WAIT=60
+VERIFY_CA=True
+
+logging.getLogger('requests').setLevel(logging.CRITICAL)
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
 
 logging.getLogger('requests').setLevel(logging.CRITICAL)
 import requests.packages.urllib3
@@ -62,34 +68,6 @@ class HttpArchive(kblab.Archive):
                 retry_wait *= 2
 
 
-    def new(self, **kwargs):
-        r = post(urljoin(self.url,'new'), params=kwargs, auth=self.auth, verify=kblab.VERIFY_CA, allow_redirects=False)
-        
-        if r.status_code != 201:
-            raise Exception('expected HTTP status 201, but got %d' % r.status_code)
-
-        url = self.url + r.headers['Location'].split('/')[-2] + '/'
-
-        return (self._get_key(url),
-                kblab.Package(
-                    url,
-                    mode='a',
-                    auth=self.auth,
-                    server_base=url.replace(self.url, self.base)))
-
-
-    def ingest(self, package, key=None):
-        files = { path:package.get_raw(path) for path in package }
-        r = post(self.url + 'ingest', files=files, auth=self.auth, verify=kblab.VERIFY_CA)
-
-        if r.status_code != 201:
-            raise Exception('expected HTTP status 201, but got %d with content %s' % (r.status_code, r.text))
-
-        url = r.headers['Location']
-
-        return self._get_key(url)
-
-
     def get(self, key, mode='r'):
         try:
             return kblab.Package(
@@ -102,22 +80,6 @@ class HttpArchive(kblab.Archive):
             return None
         except:
             raise
-
-
-    def delete(self, key, force=False):
-        if force:
-            p = self.get(key, mode='a')
-            r = htdelete(self.url + key + '/', auth=self.auth, verify=kblab.VERIFY_CA)
-
-            if r.status_code == 404:
-                return False
-
-            if r.status_code not in  [ 200, 202, 204 ]:
-                raise Exception(f'Expected status code 200, 202 or 204, got {r.status_code}')
-
-            return True
-        else:
-            raise Exception('Use the force (parameter)')
 
 
     def location(self, key, path=None):
@@ -138,7 +100,6 @@ class HttpArchive(kblab.Archive):
 
     def open(self, key, path, mode=''):
         url = self.location(key, path)
-
         r = get(url, auth=self.auth, stream=True)
 
         if r.status_code == 200:
@@ -156,28 +117,65 @@ class HttpArchive(kblab.Archive):
             return f.read()
 
 
-    def search(self, query, start=0, max=None):
-        g = self._search_iter(query, start, max)
-        i,r,c = next(g).split()
+    def search(self, query, start=0, max=None, sort=None, level=None, include=False):
+        if isinstance(query, dict):
+            query = dumps(query)
 
-        return create_result(i, r, c, g, self)
+        key_iter = self._search_iter(query, start, max, sort, level, include)
+        start,max,count = [ int(x) for x in next(key_iter).split() ]
+
+        return kblab.Result(
+                    start,
+                    min(count-start, max) if max else count-start,
+                    count,
+                    key_iter,
+                    iter([]))
 
 
-    def _search_iter(self, query, start=0, max=None):
-        params = { 'q': dumps(query), 'start': start }
+    def _search_iter(self, query, start=0, max=None, sort=None, level=None, include=False):
+        params = { 'q': query, 'from': start }
         if max: params.update({ 'max': max })
+        if level: params.update({ '@type': level })
+        if sort: params.update({ 'sort': sort })
+        if include: params.update({ 'include': 'True' })
 
-        with closing(get(urljoin(self.url, 'search'),
+        with closing(get(urljoin(self.url, '_search'),
             params=params,
             verify=kblab.VERIFY_CA,
             auth=self.auth,
             stream=True)) as r:
 
             if r.status_code == 200:
-                 for key in r.raw:
-                     yield key[:-1].decode('utf-8')
+                first=True
+                for line in r.raw:
+                    line = line[:-1].decode('utf-8').split(',', 1)
+                    
+                    yield (line[0], loads(line[1])) if include and not first else line[0]
+
+                    first=False
             else:
                 raise Exception('Expected status 200, got %d' % r.status_code)
+
+
+    def serialize(self, key_or_iter, resolve=True, iter_content=False, buffer_size=100*1024):
+        if not isinstance(key_or_iter, str):
+            raise Exception('Only single string as key_or_iter supported.')
+
+        url = self.location(key_or_iter) + '_serialize'
+
+        r = get(url, auth=self.auth, stream=True)
+    
+        if r.status_code == 200:
+            r.raw.decode_stream = True
+
+            if iter_content:
+                return kblab.utils.stream_to_iter(r.raw, chunk_size=buffer_size)
+            else:
+                return r.raw
+        elif r.status_code == 404:
+            raise FileNotFoundError(url)
+
+        raise Exception(f'Server returned {r.status_code}')
 
 
     def count(self, query, cats={}):
@@ -228,4 +226,5 @@ class HttpArchive(kblab.Archive):
 
     def __getitem__(self, key):
         return self.get(key)
+
 

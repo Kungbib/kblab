@@ -1,9 +1,9 @@
 from contextlib import closing
 from json import loads,dumps
-from requests import head,get,post,delete,put
+from requests import head,get,post,delete,put,Session
 from os.path import join,basename,abspath,isdir
 from kblab.utils import valid_path,valid_key,chunked
-from kblab.exceptions import RangeNotSupported
+from kblab.exceptions import RangeNotSupported,HttpNotFoundException
 from hashlib import sha256
 from copy import deepcopy
 from urllib.parse import urljoin,unquote
@@ -14,6 +14,7 @@ from urllib.parse import urljoin
 from tempfile import TemporaryFile
 from io import BytesIO
 from htfile import open as htopen
+import kblab
 
 VERSION = 0.1
 
@@ -24,11 +25,10 @@ class HttpPackage(kblab.Package):
         self.auth = auth
         self.base = base or url
         self.server_base = server_base or url
+        self.session = Session()
 
         if mode in [ 'r', 'a' ]:
-            with closing(get(self.url, headers={ 'Accept': 'application/json' }, auth=self.auth, verify=kblab.VERIFY_CA)) as r:
-                #print(self.url)
-
+            with closing(self._get(self.url, headers={ 'Accept': 'application/json' })) as r:
                 if r.status_code == 404:
                     raise kblab.HttpNotFoundException(r.text)
                 elif r.status_code != 200:
@@ -46,6 +46,14 @@ class HttpPackage(kblab.Package):
             raise Exception('unsupported mode (\'%s\')' % mode)
 
 
+    def get(self, path, base=None):
+        ret = deepcopy(self._desc['files'][path])
+
+        if base or self.base:
+            ret['@id'] = (base or self.base) + ret['@id']
+
+        return ret
+
     def get_location(self, path):
         return self.url + path
 
@@ -60,7 +68,7 @@ class HttpPackage(kblab.Package):
             headers['Range'] = 'bytes=%d-%s' % (range[0], str(int(range[1])) if range[1] else '')
 
         # @TODO potential resource leak
-        r = get(self.get_location(path), stream=True, auth=self.auth, headers=headers, verify=kblab.VERIFY_CA)
+        r = self._get(self.get_location(path), stream=True, headers=headers)
         r.raw.decode_stream = True
 
         if range and 'bytes' not in r.headers.get('Accept-Ranges', ''):
@@ -88,7 +96,7 @@ class HttpPackage(kblab.Package):
 
 
     def read(self, path):
-        return get(self.url + path, auth=self.auth, verify=kblab.VERIFY_CA).text
+        return self._get(self.url + path).text
 
 
     def list(self):
@@ -126,8 +134,9 @@ class HttpPackage(kblab.Package):
 
 
     def _reload(self):
-        self._desc = loads(get(self.url, auth=self.auth, verify=kblab.VERIFY_CA).text)
-        self._desc['files'] = { x['path']:x for x in self._desc['files'] }
+        with closing(self._get(self.url)) as r:
+            self._desc = loads(r.text)
+            self._desc['files'] = { x['path']:x for x in self._desc['files'] }
 
 
     def __iter__(self):
@@ -154,13 +163,12 @@ class HttpPackage(kblab.Package):
 #        return len(self._desc['files'])
 
 
-def do_hash(fname):
-    h = sha256()
-    with open(fname, mode='rb') as f:
-        b=None
-        while b != b'':
-            b = f.read(100*1024)
-            h.update(b)
+    def _get(self, url, params={}, headers={}, stream=False):
+        return self.session.get(url,
+                           auth=self.auth,
+                           params=params,
+                           headers=headers,
+                           stream=stream,
+                           verify=kblab.VERIFY_CA)
 
-    return 'SHA256:' + h.digest().hex()
 
