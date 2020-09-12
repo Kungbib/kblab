@@ -80,7 +80,7 @@ Packages may contain files of type `Structure`, `Content` or `Meta` which contai
 
 **Example**: Get all packages tagged with `SOU` created in 1927: `tags:issue meta.created:1927`.
 
-Content is indexed under `content` which is also the default prefix so the query `"olof palme" not "carl bildt"` will find any package where the phrase `"olof palme"` exists but **not** `"carl bildt"`
+Content is indexed under `content` which is also the default prefix so the query `"olof palme" and "carl bildt"` will find any package where the phrase `"olof palme"` and `"carl bildt"` appear.
 
 **Also:** see examples below.
 
