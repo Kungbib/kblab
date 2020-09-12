@@ -146,7 +146,7 @@ Indexing is experimental at this point so verify your results.
 from kblab import Archive
 
 # connect to betalab. Use parameter auth=(username, password) for authentication
-a = Archive('https://betalab.kb.se')
+a = Archive('https://betalab.kb.se', auth=('username', 'hunter2'))
 ```
 
 **Caveat**: if you get an error about "certificate verify failed" you may need to update the root certificates on you platform. You can also add the following lines to your code. Please not that this is **NOT ADVISED**, it is better to add the correct root certificates.
