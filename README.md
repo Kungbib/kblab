@@ -190,7 +190,7 @@ for package_id in a.search({ 'label': 'AFTONBLADET' }, max=25):
     p = a.get(package_id)
 
     if 'content.json' in p:
-        for part in load(p.get_raw(fname)):
+        for part in load(p.open(fname)):
             c.update(part.get('content', '').toupper().split())
 
 for word,count in c:
@@ -215,7 +215,7 @@ def count(package_id):
     p = a.get(package_id)
         
     if 'content.json' in p:
-        for part in load(p.get_raw(fname)):
+        for part in load(p.open(fname)):
             c.update(part.get('content', '').toupper().split())
     
     return c
@@ -250,8 +250,9 @@ with Pool() as pool:
 
 Images in the archive can either be downloaded and dealt with directly in full resolution or they can be cropped and scaled using the [IIIF](https://iiif.io/) protocol.
 
+<!--
 ### Manifests
 
 For same packages IIIF-[manifests](https://iiif.io/api/presentation/2.0/#manifest) can be accessed by adding `/_manifest` to a URI. See example below.
 
-
+-->
