@@ -1,6 +1,6 @@
 # KB data lab
 
-**Note:** This repository is under active development, is not fully (or at all) functional, and is provided as-is
+**Note:** This repository, API endpoint and correspondning site is under active development, is not fully (or at all) functional, and is provided as-is
 
 ## About
 
