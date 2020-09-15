@@ -190,7 +190,7 @@ for package_id in a.search({ 'label': 'AFTONBLADET' }, max=25):
     p = a.get(package_id)
 
     if 'content.json' in p:
-        for part in load(p.open(fname)):
+        for part in load(p.get_raw(fname)):
             c.update(part.get('content', '').toupper().split())
 
 for word,count in c:
@@ -215,7 +215,7 @@ def count(package_id):
     p = a.get(package_id)
         
     if 'content.json' in p:
-        for part in load(p.open(fname)):
+        for part in load(p.get_raw(fname)):
             c.update(part.get('content', '').toupper().split())
     
     return c
