@@ -33,6 +33,8 @@ Then, see [examples](#examples) below.
 
 Start environment using docker. The local directory `./data` will be mounted on `/data` in the container. Any change from within the container will be reflected in the local directory and vice versa.
 ```
+git clone https://github.com/kungbib/kblab
+cd kblab
 docker build --tag repository.kb.se/lab/client:local .
 docker container run -it repository.kb.se/lab/client:local /bin/bash
 d8fg7sjf4i # python
