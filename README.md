@@ -81,7 +81,7 @@ Examples
 
 Packages may contain files of type `Structure`, `Content` or `Meta` which contain structure information, content and metadata respectively (see below for examples). The meta and content files are indexed and can be searched through the API. Content is indexed under `content` and metadata under `meta.*` and can be accesed either through the web interface or through the API. For example: 
 
-**Example**: Get all packages tagged with `SOU` created in 1927: `tags:issue meta.created:1927`.
+**Example**: Get all packages tagged with `SOU` created in 1927: `tags:SOU meta.created:1927`.
 
 Content is indexed under `content` which is also the default prefix so the query `"olof palme" and "carl bildt"` will find any package where the phrase `"olof palme"` and `"carl bildt"` appear.
 
