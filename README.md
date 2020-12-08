@@ -187,7 +187,7 @@ from json import load
 a = Archive('https://betalab.kb.se/')
 c = Counter()
 
-# find a specific issue of Aftonbladet
+# get 25 issues of Aftonbladet
 for package_id in a.search({ 'label': 'AFTONBLADET' }, max=25):
     print(package_id)
     p = a.get(package_id)
